@@ -5,6 +5,9 @@ target/
 .DS_Store
 spring-shell.log
 tmp/
+.mvn
+mvnw
+mvnw.cmd
 
 ### STS ###
 .apt_generated
