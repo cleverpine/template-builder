@@ -1,0 +1,54 @@
+docker:
+  compose:
+    fileName: docker-compose.yml
+    version: "3.9"
+    defaultServicePort: 8081
+    springProfile: local
+    springDefaultPort: 8080
+git:
+  checkurl:
+  sshkey:
+    location: .ssh
+    passphrase:
+file:
+  location: /tmp
+angular:
+  template:
+    name: template
+    repo:
+    branch: master
+    module-names:
+      ui: template-ui
+      api: template-api
+react:
+  template:
+    name: template
+    repo:
+    branch: master
+    module-names:
+      ui: template-ui
+      api: template-api
+spring:
+  template:
+    name: template
+    repo:
+    branch: master
+    module-names:
+      service: template-service
+      api: template-api
+quarkus:
+  template:
+    name: template
+    repo:
+    branch: master
+    module-names:
+      service: template-service
+      api: template-api
+cloudconfig:
+  image:
+  container-name:
+  port:
+  encrypt-key:
+  user:
+  password:
+  folder: 
