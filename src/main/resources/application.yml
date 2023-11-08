@@ -9,46 +9,46 @@ git:
   checkurl:
   sshkey:
     location: .ssh
-    passphrase:
+    passphrase: tbd
 file:
   location: /tmp
 angular:
   template:
     name: template
-    repo:
-    branch: master
+    repo: tbd
+    branch: main
     module-names:
       ui: template-ui
       api: template-api
 react:
   template:
     name: template
-    repo:
-    branch: master
+    repo: tbd
+    branch: main
     module-names:
       ui: template-ui
       api: template-api
 spring:
   template:
     name: template
-    repo:
-    branch: master
+    repo: git@github.com:cleverpine/spring-template.git
+    branch: main
     module-names:
       service: template-service
       api: template-api
 quarkus:
   template:
     name: template
-    repo:
-    branch: master
+    repo: tbd
+    branch: main
     module-names:
       service: template-service
       api: template-api
 cloudconfig:
-  image:
-  container-name:
-  port:
-  encrypt-key:
-  user:
-  password:
-  folder: 
+  image: tbd
+  container-name: tbd
+  port: 8888
+  encrypt-key: tbd
+  user: tbd
+  password: tbd
+  folder: tbd
