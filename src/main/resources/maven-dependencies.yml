@@ -1,0 +1,6 @@
+dependencies:
+  spring:
+    - groupId: com.cleverpine
+      artifactId: cp-spring-error-util
+      version: 2.0.1
+      branch: cp_error_util

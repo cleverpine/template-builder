@@ -4,6 +4,7 @@ import com.cleverpine.templatebuilder.config.GitProperties;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.eclipse.jgit.transport.SshSessionFactory;
 import org.eclipse.jgit.transport.URIish;
@@ -13,6 +14,8 @@ import org.eclipse.jgit.util.FS;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -57,7 +60,7 @@ public class GitService {
         }
     }
 
-    public void cloneRepository(String repositoryUrl, String branch, File targetDirectory) {
+    public Git cloneRepository(String repositoryUrl, String branch, File targetDirectory) {
         File sshDir = new File(FS.DETECTED.userHome(), gitProperties.getSshKeyLocation());
 
         var sshSessionFactory = new SshdSessionFactory();
@@ -70,8 +73,10 @@ public class GitService {
                 .setCloneSubmodules(true)
                 .setCredentialsProvider(getCredentials())
                 .setDirectory(targetDirectory)
+                .setCloneAllBranches(true)
                 .call()) {
             // Cloning process completed successfully
+            return git;
         } catch (GitAPIException e) {
             throw new RuntimeException(e);
         }
@@ -96,8 +101,6 @@ public class GitService {
     public void addAll(File targetDirectory) {
         try (Git git = Git.open(targetDirectory)) {
             git.add().addFilepattern(".").call();
-        } catch (GitAPIException e) {
-            throw new RuntimeException(e);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -106,8 +109,6 @@ public class GitService {
     public void commit(File targetDirectory, String message) {
         try (Git git = Git.open(targetDirectory)) {
             git.commit().setMessage(message).call();
-        } catch (GitAPIException e) {
-            throw new RuntimeException(e);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -116,8 +117,6 @@ public class GitService {
     public void push(File targetDirectory) {
         try (Git git = Git.open(targetDirectory)) {
             git.push().setCredentialsProvider(getCredentials()).call();
-        } catch (GitAPIException e) {
-            throw new RuntimeException(e);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -126,8 +125,6 @@ public class GitService {
     public void addRemoteOrigin(File targetDirectory, String repositoryUrl) {
         try (Git git = Git.open(targetDirectory)) {
             git.remoteAdd().setName("origin").setUri(new URIish(repositoryUrl)).call();
-        } catch (GitAPIException e) {
-            throw new RuntimeException(e);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -137,9 +134,27 @@ public class GitService {
         try (Git git = Git.open(targetDirectory)) {
             git.submoduleAdd().setURI(repositoryUrl).setPath(path)
                     .setCredentialsProvider(getCredentials()).call();
-        } catch (GitAPIException e) {
-            throw new RuntimeException(e);
         } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void mergeBranches(Git git, List<String> branchesToMerge) {
+        try {
+            var mergeCommand = git.merge();
+            var repository = git.getRepository();
+            branchesToMerge.forEach(branch -> {
+                Ref ref;
+                try {
+                    branch = "refs/remotes/origin/" + branch;
+                    ref = repository.findRef(branch);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                mergeCommand.include(ref);
+            });
+            mergeCommand.call();
+        } catch (GitAPIException e) {
             throw new RuntimeException(e);
         }
     }

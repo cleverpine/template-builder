@@ -32,7 +32,7 @@ spring:
   template:
     name: template
     repo: git@github.com:cleverpine/spring-template.git
-    branch: main
+    branch: base
     module-names:
       service: template-service
       api: template-api
