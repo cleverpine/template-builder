@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.cleverpine</groupId>
     <artifactId>template-builder</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <name>template-builder</name>
     <description>template-builder</description>
     <properties>
