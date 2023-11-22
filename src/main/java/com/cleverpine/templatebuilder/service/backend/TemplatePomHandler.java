@@ -17,6 +17,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -45,6 +47,19 @@ public abstract class TemplatePomHandler {
                 .map(name -> "/*[local-name()='" + name + "']")
                 .collect(Collectors.joining());
     }
+
+    protected final void addDependencyProperties(Document document, String xPathExpression, List<Map<String, String>> properties) {
+        XPath xPath = document.createXPath(xPathExpression);
+        Element propertyElement = (Element) xPath.selectSingleNode(document);
+
+        if (propertyElement != null) {
+            properties.forEach(property -> {
+                Element dependencyElement = propertyElement.addElement("dependency");
+                property.forEach((key, value) -> dependencyElement.addElement(key).setText(value));
+            });
+        }
+    }
+
 
     protected final void processPomFile(String pomFilePath, Consumer<Document> documentProcessor) {
         File pomFile = fileService.getFile(pomFilePath);

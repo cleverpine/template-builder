@@ -4,12 +4,14 @@ import com.cleverpine.templatebuilder.dto.instructions.*;
 import com.cleverpine.templatebuilder.dto.instructions.enums.BackendTemplateType;
 import com.cleverpine.templatebuilder.dto.instructions.enums.DatabaseType;
 import com.cleverpine.templatebuilder.dto.instructions.enums.FrontendTemplateType;
+import com.cleverpine.templatebuilder.dto.dependency.MavenDependency;
 import com.cleverpine.templatebuilder.service.backend.BackendService;
 import org.jline.reader.LineReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -105,12 +107,18 @@ public class CmdService {
 
     private BackendServiceInstructions promptForBackendServiceInstructions(ProjectInstructions projectInstructions) {
         BackendServiceInstructions instructions = new BackendServiceInstructions();
+
         promptForBaseInstructions(
                 instructions,
                 projectInstructions.isGitSetup(),
                 projectInstructions.getBackendServiceNames());
-        instructions.setTemplateType(
-                promptForEnum("Enter Backend Template Type", BackendTemplateType.class));
+
+        var backEndTemplateType = promptForEnum("Enter Backend Template Type", BackendTemplateType.class);
+        instructions.setTemplateType(backEndTemplateType);
+
+        var dependencies = promptForDependencies(backEndTemplateType);
+        instructions.setDependencies(dependencies);
+
         instructions.setDatabaseType(
                 promptForEnum("Enter Database Type", DatabaseType.class));
         instructions.setRepository(
@@ -205,6 +213,18 @@ public class CmdService {
             builder.append(enumValues.get(i));
         }
         return builder.toString();
+    }
+
+    private List<MavenDependency> promptForDependencies(BackendTemplateType templateType) {
+        var promptBase = "Please enter the number of your choice";
+        var availableDependencies = backendService.getDependenciesMap(templateType);
+        var selectedDependencies = new ArrayList<MavenDependency>();
+        while (promptForBoolean("Do you want to add external libraries to the project?")) {
+            var selectedDependency = promptFromSet(promptBase, availableDependencies.keySet());
+            selectedDependencies.add(availableDependencies.get(selectedDependency));
+            availableDependencies.remove(selectedDependency);
+        }
+        return selectedDependencies;
     }
 
 }
