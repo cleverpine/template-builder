@@ -47,5 +47,7 @@ public class SpringRenameHandler extends RenameHandler {
                 .resolve(TemplateModuleUtil.SERVICE_STATIC_PATH)
                 .resolve(templateModuleUtil.getApiModuleName(instructions.getName()));
         renameDirectory(oldServiceStaticApiDir, newServiceStaticApiDir);
+        renameYmlFile(instructions.getName());
+        fixImports(instructions.getName());
     }
 }
