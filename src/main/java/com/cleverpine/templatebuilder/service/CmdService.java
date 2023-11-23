@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,7 +61,7 @@ public class CmdService {
 
         while (promptForBoolean("Do you want to include a backend service? ")) {
             projectInstructions.addBackendServiceInstructions(
-                    promptForBackendServiceInstructions(projectInstructions));
+                    promptForBackendServiceInstructions(gitSetup, projectInstructions.getBackendServiceNames()));
         }
         while (promptForBoolean("Do you want to include a frontend service? ")) {
             projectInstructions.addFrontendServiceInstructions(
@@ -71,6 +72,18 @@ public class CmdService {
                 sharedInstructions.getProjectName()))) {
             createLocalSetup(projectInstructions);
             return projectInstructions.toString();
+        } else {
+            return "Project creation cancelled.";
+        }
+    }
+
+    public String configureBackendService() {
+        boolean gitSetup = promptForBoolean("Do you want to push the project to a git repository? ");
+        var instructions = promptForBackendServiceInstructions(gitSetup, Collections.emptySet());
+
+        if (promptForBoolean(String.format("\n Are you sure you want to create the %s project?", instructions.getName()))) {
+            backendService.createService(instructions);
+            return instructions.toString();
         } else {
             return "Project creation cancelled.";
         }
@@ -105,13 +118,10 @@ public class CmdService {
         return null;
     }
 
-    private BackendServiceInstructions promptForBackendServiceInstructions(ProjectInstructions projectInstructions) {
+    private BackendServiceInstructions promptForBackendServiceInstructions(boolean gitSetup, Set<String> usedNames) {
         BackendServiceInstructions instructions = new BackendServiceInstructions();
 
-        promptForBaseInstructions(
-                instructions,
-                projectInstructions.isGitSetup(),
-                projectInstructions.getBackendServiceNames());
+        promptForBaseInstructions(instructions, gitSetup, usedNames);
 
         var backEndTemplateType = promptForEnum("Enter Backend Template Type", BackendTemplateType.class);
         instructions.setTemplateType(backEndTemplateType);
@@ -119,11 +129,8 @@ public class CmdService {
         var dependencies = promptForDependencies(backEndTemplateType);
         instructions.setDependencies(dependencies);
 
-        instructions.setDatabaseType(
-                promptForEnum("Enter Database Type", DatabaseType.class));
-        instructions.setRepository(
-                promptRepoInstructions(String.format("%s api", instructions.getName()),
-                        projectInstructions.isGitSetup()));
+        instructions.setDatabaseType(promptForEnum("Enter Database Type", DatabaseType.class));
+        instructions.setRepository(promptRepoInstructions(String.format("%s api", instructions.getName()), gitSetup));
         System.out.println("Backend instructions complete.\n");
         return instructions;
     }
@@ -220,6 +227,10 @@ public class CmdService {
         var availableDependencies = backendService.getDependenciesMap(templateType);
         var selectedDependencies = new ArrayList<MavenDependency>();
         while (promptForBoolean("Do you want to add external libraries to the project?")) {
+            if (availableDependencies.isEmpty()) {
+                System.out.println("No more dependencies available.");
+                break;
+            }
             var selectedDependency = promptFromSet(promptBase, availableDependencies.keySet());
             selectedDependencies.add(availableDependencies.get(selectedDependency));
             availableDependencies.remove(selectedDependency);

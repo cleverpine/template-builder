@@ -140,6 +140,10 @@ public class GitService {
     }
 
     public void mergeBranches(Git git, List<String> branchesToMerge) {
+        if (branchesToMerge == null || branchesToMerge.isEmpty()) {
+            return;
+        }
+
         try {
             var mergeCommand = git.merge();
             var repository = git.getRepository();

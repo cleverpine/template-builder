@@ -24,30 +24,27 @@ import java.util.regex.Pattern;
 public class TemplateBuild extends AbstractShellComponent {
 
     public static final String CMD_NEW_PROJECT = "new";
-
+    public static final String CMD_NEW_BACKEND_SERVICE = "new-backend";
     public static final String CMD_ADD_CLOUD_CONFIG = "add-cloud-config";
     public static final String CMD_DIR_CONFIG = "dir-config";
-
     public static final String CMD_GIT_CONFIG = "git-config";
     public static final String CMD_CLONE = "clone";
     public static final String CMD_CLONE_ONLY = "clone-only";
     public static final String CMD_ADD_TO_GIT = "add-to-git";
     public static final String CMD_DELETE = "delete";
     public static final String CMD_DELETE_GIT_CONFIG = "delete-git-config";
-    private final TemplateService templateService;
 
+    private final TemplateService templateService;
     private final CloudConfigService cloudConfigService;
     private final GitService gitService;
-
     private final FileService fileService;
-
     private final CmdService cmdService;
 
     @Lazy
     @Autowired
     private LineReader lineReader;
 
-//TODO    @ShellMethodAvailability({CMD_CLONE, CMD_CLONE_ONLY, CMD_ADD_TO_GIT, CMD_ADD_CLOUD_CONFIG, CMD_NEW_PROJECT})
+//TODO    @ShellMethodAvailability({CMD_CLONE, CMD_CLONE_ONLY, CMD_ADD_TO_GIT, CMD_ADD_CLOUD_CONFIG, CMD_NEW_PROJECT, CMD_NEW_BACKEND_SERVICE})
     @ShellMethodAvailability({CMD_CLONE, CMD_CLONE_ONLY, CMD_ADD_TO_GIT, CMD_ADD_CLOUD_CONFIG})
     public Availability generalAvailability() {
         return gitService.gitConfigured() && fileService.directoryConfigured() ?
@@ -68,6 +65,11 @@ public class TemplateBuild extends AbstractShellComponent {
     @ShellMethod(value = "Configure new Project", key = CMD_NEW_PROJECT)
     public String newProject() {
         return cmdService.configureProject();
+    }
+
+    @ShellMethod(value = "Configure new Backend Service", key = CMD_NEW_BACKEND_SERVICE)
+    public String newBackendService() {
+        return cmdService.configureBackendService();
     }
 
     @ShellMethod(value = "Add cloud config service", key = CMD_ADD_CLOUD_CONFIG)
