@@ -130,7 +130,7 @@ public class CmdService {
         instructions.setDependencies(dependencies);
 
         instructions.setDatabaseType(promptForEnum("Enter Database Type", DatabaseType.class));
-        instructions.setRepository(promptRepoInstructions(String.format("%s api", instructions.getName()), gitSetup));
+        instructions.setApiRepository(promptRepoInstructions(String.format("%s api", instructions.getName()), gitSetup));
         System.out.println("Backend instructions complete.\n");
         return instructions;
     }
